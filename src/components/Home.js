@@ -17,7 +17,7 @@ import { SearchBar } from "./SearchBar";
 import { Button } from "./Button";
 
 export const Home = () => {
-    const {state, loading, error, searchTerm, setSearchTerm, fetchMovies, setIsLoadingMore} = useHomeFetch();
+    const {state, loading, error, searchTerm, setSearchTerm, setIsLoadingMore} = useHomeFetch();
  
     console.log(state);
 
