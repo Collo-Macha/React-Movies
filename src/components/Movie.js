@@ -18,12 +18,48 @@ import MovieInfoBar from "./MovieInfoBar";
 
 import Actor from "./Actor";
 
-const Movie = () => {
-    const { movieId } = useParams(); 
+import API from "../API";
 
-    const { state: movie, loading, error } = useMovieFetch(movieId);
+import { Component } from "react";
 
-    // show spinner / error while data is loading
+class Movie extends Component {
+    state = {
+        movie: {},
+        loading: false,
+        error: false
+    };
+
+    componentDidMount() {
+        this.fetchMovie();
+    }
+
+    fetchMovie = async () => {
+        const { movieId } = this.props.params;
+
+        try {
+            this.setState({ loading: true, error: false });
+            const movie = await API.fetchMovie(movieId);
+            const credits = await API.fetchCredits(movieId);
+            const directors = credits.crew.filter(
+                member => member.job === 'Director'
+            );
+
+            this.setState({
+                movie: { 
+                ...movie,
+                directors,
+                actors: credits.cast
+                },
+                loading: false
+            });
+        } catch (error) {
+            this.setState({ error: true, loading: false });
+        }
+    };
+
+    render() {
+        const { movie, loading, error } = this.state;
+
     if (loading) return <Spinner />;
     if (error) return <div>Something went wrong...</div>;
 
@@ -52,5 +88,9 @@ const Movie = () => {
             </Grid>
         </>
     );
-};
-export default Movie;
+    }
+}
+
+const MovieWithParams = props => <Movie {...props} params={useParams()} />;
+
+export default MovieWithParams;
